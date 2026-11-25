@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Ingesta & Reels | Convención ANEAS 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        emeraldBrand: {
+                            DEFAULT: '#10b981',
+                            teal: '#14b8a6',
+                            dark: '#064e3b',
+                            muted: 'rgba(16, 185, 129, 0.15)'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Personalización de scrollbar y detalles visuales */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #10b981;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* Animación suave para tarjetas */
+        .card-transition {
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+    </style>
+</head>
+<body class="bg-[#0f172a] text-slate-200 min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-slate-950">
+
+    <!-- Notificación Toast Flotante -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-2.5 bg-slate-900 border border-emerald-500/50 text-emerald-300 px-4 py-3 rounded-xl shadow-2xl shadow-black/80 text-sm font-medium">
+        <svg class="w-5 h-5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        <span id="toast-msg">Copiado ✓</span>
+    </div>
+
+    <!-- Header / Barra Superior Fija -->
+    <header class="sticky top-0 z-40 bg-[#111827]/95 backdrop-blur-md border-b border-slate-800 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                
+                <!-- Identidad del Proyecto -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 border border-emerald-400/40 flex items-center justify-center shadow-inner shrink-0">
+                            <svg class="w-5 h-5 text-slate-950 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <h1 class="text-base sm:text-lg font-bold tracking-tight text-white">ANEAS 2026 · Control de Respaldo y Edición</h1>
+                                <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                                    MIÉ 25 NOV
+                                </span>
+                            </div>
+                            <p class="text-xs text-slate-400">Ingesta de crudos y ediciones de Santi · Somos Estrategia</p>
+                        </div>
+                    </div>
+
+                    <!-- Botón Reporte Mobile -->
+                    <button onclick="copyWhatsAppReport()" class="lg:hidden inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-slate-950 text-xs font-bold transition shadow-md active:scale-95">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                        <span>Estatus</span>
+                    </button>
+                </div>
+
+                <!-- Métricas de Progreso Global y Acciones -->
+                <div class="flex flex-wrap items-center justify-between lg:justify-end gap-3 sm:gap-4 pt-2 lg:pt-0 border-t lg:border-t-0 border-slate-800/80">
+                    
+                    <!-- Contador Global Total -->
+                    <div class="flex items-center gap-3 bg-slate-900/90 border border-slate-800 px-3.5 py-2 rounded-xl flex-1 sm:flex-initial">
+                        <div class="flex flex-col min-w-[140px]">
+                            <div class="flex items-center justify-between text-xs mb-1">
+                                <span class="text-slate-400 font-medium">Avance Global</span>
+                                <span id="global-total-count" class="font-mono font-bold text-white">0 / 45 completados</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                                <div id="global-total-bar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <span id="global-total-pct" class="text-sm font-bold font-mono text-emerald-400">0%</span>
+                    </div>
+
+                    <!-- Progreso Ediciones Santi -->
+                    <div class="flex items-center gap-3 bg-slate-900/90 border border-slate-800 px-3.5 py-2 rounded-xl flex-1 sm:flex-initial">
+                        <div class="flex flex-col min-w-[105px]">
+                            <div class="flex items-center justify-between text-xs mb-1">
+                                <span class="text-slate-400 font-medium">Santi (Edita)</span>
+                                <span id="global-reels-count" class="font-mono font-bold text-white">0/4</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                                <div id="global-reels-bar" class="h-full bg-teal-400 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <span id="global-reels-pct" class="text-sm font-bold font-mono text-teal-400">0%</span>
+                    </div>
+
+                    <!-- Botón Reporte Desktop -->
+                    <button onclick="copyWhatsAppReport()" class="hidden lg:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold transition shadow-lg shadow-emerald-500/20 active:scale-95 cursor-pointer">
+                        <svg class="w-4 h-4 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                        <span>Copiar Estatus</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Navegación por Pestañas -->
+            <nav class="flex items-center gap-1.5 sm:gap-2 mt-4 overflow-x-auto no-scrollbar pb-1" id="tabs-container" role="tablist">
+                <!-- Se genera dinámicamente desde JS -->
+            </nav>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
+        
+        <!-- Barra de herramientas de la pestaña activa -->
+        <div id="tab-toolbar" class="flex flex-col gap-4 mb-6 bg-[#1e293b]/85 border border-slate-700/80 p-4 rounded-2xl shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                    <div class="flex items-center gap-2.5 flex-wrap">
+                        <h2 id="active-tab-title" class="text-xl font-bold text-white">Daniel</h2>
+                        <span id="active-tab-badge" class="px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-slate-800 text-slate-300">0/0 listos</span>
+                        <!-- Botón para renombrar al 4to integrante -->
+                        <button id="rename-member-btn" onclick="openRenameModal()" class="hidden items-center gap-1 text-xs text-teal-300 hover:text-slate-950 bg-teal-500/15 hover:bg-teal-400 border border-teal-500/40 px-2.5 py-1 rounded-lg font-semibold transition cursor-pointer">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                            <span>Cambiar nombre</span>
+                        </button>
+                    </div>
+                    <p id="active-tab-subtitle" class="text-xs sm:text-sm text-slate-400 mt-1">Video 16:9 · 1 a 2 min de crudo por actividad</p>
+                </div>
+
+                <!-- Botón Agregar Actividad / Edición -->
+                <button id="add-item-btn" onclick="openAddModal()" class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 text-xs font-semibold border border-emerald-500/40 transition cursor-pointer active:scale-95 shrink-0">
+                    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    <span id="add-item-btn-label">+ Agregar actividad</span>
+                </button>
+            </div>
+
+            <!-- Buscador rápido y Filtros de estado -->
+            <div id="search-filter-bar" class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-3 border-t border-slate-700/60">
+                <!-- Input de Búsqueda -->
+                <div class="relative flex-1 max-w-md">
+                    <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <input type="text" id="search-input" oninput="setSearchQuery(this.value)" placeholder="Buscar por número (ej. 01), palabra clave o sala..." class="w-full bg-slate-900/90 border border-slate-700 focus:border-emerald-500 rounded-xl pl-9 pr-8 py-1.5 text-xs sm:text-sm text-white placeholder-slate-500 outline-none transition">
+                    <button id="clear-search-btn" onclick="clearSearch()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+
+                <!-- Filtro de estado -->
+                <div id="filter-group" class="flex items-center bg-slate-900 border border-slate-700/80 rounded-xl p-1 text-xs self-start sm:self-auto">
+                    <button onclick="setFilter('all')" data-filter="all" class="filter-btn px-3 py-1.5 rounded-lg font-medium transition cursor-pointer">Todos</button>
+                    <button onclick="setFilter('pending')" data-filter="pending" class="filter-btn px-3 py-1.5 rounded-lg font-medium transition cursor-pointer">Pendientes</button>
+                    <button onclick="setFilter('done')" data-filter="done" class="filter-btn px-3 py-1.5 rounded-lg font-medium transition cursor-pointer">Listos</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerta contextual (Ej. Nota en Daniel sobre página 2/4 faltante) -->
+        <div id="context-alert" class="hidden mb-6 bg-amber-950/30 border border-amber-500/30 rounded-2xl p-4 flex items-start gap-3">
+            <svg class="w-5 h-5 text-amber-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            <div class="text-xs sm:text-sm text-amber-200/90 leading-relaxed">
+                <strong class="text-amber-300 font-semibold">Nota de captura:</strong> Faltó la página <span class="font-mono bg-amber-900/50 px-1.5 py-0.5 rounded">2/4</span> de Daniel (entre 11:50 y 13:15). Si te pasan esas actividades, agrégalas con el botón <strong>"+ Agregar actividad"</strong>.
+            </div>
+        </div>
+
+        <!-- Contenedor Dinámico de Tarjetas -->
+        <div id="cards-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Las tarjetas se renderizan con JS -->
+        </div>
+
+        <!-- Estado Vacío / Banner del 4to Integrante -->
+        <div id="empty-state" class="hidden bg-[#1e293b]/80 border border-dashed border-teal-500/40 rounded-2xl p-6 sm:p-10 max-w-2xl mx-auto my-4">
+            <div class="text-center mb-6">
+                <div class="w-14 h-14 rounded-2xl bg-teal-500/15 border border-teal-500/40 text-teal-300 flex items-center justify-center mx-auto mb-3">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-1">Listo para recibir la lista del 4to integrante</h3>
+                <p class="text-xs sm:text-sm text-slate-400">Ponle nombre a la pestaña (ej. Alan) y agrega sus actividades una por una o pegando varias líneas de golpe.</p>
+            </div>
+
+            <!-- Input rápido inline para renombrar -->
+            <form onsubmit="handleInlineRename(event)" class="flex flex-col sm:flex-row gap-2 max-w-md mx-auto mb-6">
+                <input type="text" id="inline-member-name" placeholder="Nombre del integrante (ej. Alan)..." class="flex-1 bg-slate-900 border border-slate-700 focus:border-teal-400 rounded-xl px-3.5 py-2 text-sm text-white outline-none">
+                <button type="submit" class="px-4 py-2 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 text-xs font-bold transition cursor-pointer shrink-0">
+                    Guardar nombre
+                </button>
+            </form>
+
+            <div class="flex flex-wrap items-center justify-center gap-3 pt-4 border-t border-slate-700/70">
+                <button onclick="openAddModal('single')" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold border border-slate-600 transition cursor-pointer">
+                    + Agregar una actividad
+                </button>
+                <button onclick="openAddModal('bulk')" class="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold transition shadow-lg shadow-emerald-500/20 cursor-pointer">
+                    Pegar varias líneas de golpe
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer discreto con opción de resetear datos si hiciera falta -->
+    <footer class="max-w-7xl w-full mx-auto px-4 sm:px-6 py-5 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
+        <span>Guardado automático local activado · Convención ANEAS 2026</span>
+        <button onclick="openResetModal()" class="text-slate-500 hover:text-rose-400 transition underline underline-offset-2 cursor-pointer">
+            Reiniciar todo
+        </button>
+    </footer>
+
+    <!-- MODAL: Agregar Actividad (Individual o Pegado Rápido en Lote) -->
+    <div id="add-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="bg-[#1e293b] border border-slate-700 rounded-2xl max-w-lg w-full p-6 shadow-2xl">
+            <div class="flex items-center justify-between mb-4">
+                <h3 id="add-modal-title" class="text-lg font-bold text-white">Agregar actividad de respaldo</h3>
+                <button onclick="closeModal('add-modal')" class="text-slate-400 hover:text-white p-1 rounded-lg cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- Selector de modo para actividades de respaldo -->
+            <div id="add-mode-switcher" class="flex gap-2 p-1 bg-slate-900 rounded-xl border border-slate-800 mb-4 text-xs">
+                <button type="button" onclick="setAddMode('single')" id="mode-single-btn" class="flex-1 py-1.5 rounded-lg font-semibold bg-emerald-500 text-slate-950 transition cursor-pointer">Una actividad</button>
+                <button type="button" onclick="setAddMode('bulk')" id="mode-bulk-btn" class="flex-1 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition cursor-pointer">Pegar lista rápida</button>
+            </div>
+
+            <!-- Formulario Individual -->
+            <form id="single-add-form" onsubmit="handleSingleAdd(event)" class="space-y-3.5">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label id="folder-field-label" class="block text-xs font-medium text-slate-300 mb-1">Carpeta ([num]_[palabra]) *</label>
+                        <input type="text" id="inp-folder" required placeholder="ej. 15_tema_clave" class="w-full bg-slate-900 border border-slate-700 focus:border-emerald-500 rounded-xl px-3 py-2 text-sm font-mono text-white outline-none">
+                    </div>
+                    <div>
+                        <label id="time-field-label" class="block text-xs font-medium text-slate-300 mb-1">Hora *</label>
+                        <input type="text" id="inp-time" required placeholder="ej. 12:00" class="w-full bg-slate-900 border border-slate-700 focus:border-emerald-500 rounded-xl px-3 py-2 text-sm text-white outline-none">
+                    </div>
+                </div>
+                <div id="room-field-wrapper">
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Sala</label>
+                    <input type="text" id="inp-room" placeholder="ej. Acueducto 2" class="w-full bg-slate-900 border border-slate-700 focus:border-emerald-500 rounded-xl px-3 py-2 text-sm text-white outline-none">
+                </div>
+                <div>
+                    <label id="title-field-label" class="block text-xs font-medium text-slate-300 mb-1">Título de la ponencia *</label>
+                    <input type="text" id="inp-title" required placeholder="ej. Gestión integral del agua en..." class="w-full bg-slate-900 border border-slate-700 focus:border-emerald-500 rounded-xl px-3 py-2 text-sm text-white outline-none">
+                </div>
+                <div class="flex justify-end gap-2 pt-3">
+                    <button type="button" onclick="closeModal('add-modal')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 cursor-pointer">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-xs font-bold text-slate-950 cursor-pointer">Guardar</button>
+                </div>
+            </form>
+
+            <!-- Formulario en Lote (Para pegar varias líneas del 4to integrante) -->
+            <form id="bulk-add-form" onsubmit="handleBulkAdd(event)" class="hidden space-y-3">
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    Escribe o pega una actividad por línea separada por <code class="text-emerald-300 font-mono">|</code>:<br>
+                    <code class="text-teal-300 font-mono bg-slate-900 px-1.5 py-0.5 rounded block mt-1">02_inauguracion | 09:00 | Salón Principal | Inauguración oficial</code>
+                </p>
+                <textarea id="inp-bulk" rows="6" placeholder="05_panel_agua | 10:15 | Acueducto 4 | Panel de innovación&#10;19_taller_redes | 11:30 | Sala Técnica 2 | Taller de redes" class="w-full bg-slate-900 border border-slate-700 focus:border-emerald-500 rounded-xl p-3 text-xs font-mono text-white outline-none"></textarea>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('add-modal')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 cursor-pointer">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-xs font-bold text-slate-950 cursor-pointer">Importar lista</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: Renombrar 4to Integrante -->
+    <div id="rename-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="bg-[#1e293b] border border-slate-700 rounded-2xl max-w-sm w-full p-6 shadow-2xl">
+            <h3 class="text-lg font-bold text-white mb-2">Nombre del 4to integrante</h3>
+            <p class="text-xs text-slate-400 mb-4">Personaliza la pestaña y el subtítulo de equipo (ej. Alan).</p>
+            <form onsubmit="handleRenameMember(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Nombre *</label>
+                    <input type="text" id="inp-member-name" required placeholder="ej. Alan" class="w-full bg-slate-900 border border-slate-700 focus:border-teal-400 rounded-xl px-3 py-2 text-sm text-white outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Rol / Equipo (opcional)</label>
+                    <input type="text" id="inp-member-role" placeholder="ej. Celular · Clips e historias 9:16" class="w-full bg-slate-900 border border-slate-700 focus:border-teal-400 rounded-xl px-3 py-2 text-sm text-white outline-none">
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('rename-modal')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 cursor-pointer">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-teal-500 hover:bg-teal-400 text-xs font-bold text-slate-950 cursor-pointer">Actualizar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: Confirmar Restauración -->
+    <div id="reset-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="bg-[#1e293b] border border-slate-700 rounded-2xl max-w-sm w-full p-6 shadow-2xl">
+            <h3 class="text-lg font-bold text-white mb-2">¿Reiniciar todo?</h3>
+            <p class="text-xs text-slate-400 mb-5 leading-relaxed">Esto borrará tus marcas de respaldo actuales, nombres de carpeta editados y actividades agregadas, volviendo a la plantilla inicial de la Convención ANEAS 2026.</p>
+            <div class="flex justify-end gap-2">
+                <button onclick="closeModal('reset-modal')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 cursor-pointer">Cancelar</button>
+                <button onclick="resetAllData()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-xs font-semibold text-white cursor-pointer">Sí, reiniciar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. DATOS INICIALES PRECARGADOS
+        // ==========================================
+        const STORAGE_KEY = 'aneas_2026_ingesta_v2';
+
+        const INITIAL_DATA = {
+            activeTab: 'daniel',
+            filter: 'all',
+            searchQuery: '',
+            members: {
+                daniel: {
+                    id: 'daniel',
+                    name: 'Daniel',
+                    role: 'Video 16:9 · 1 a 2 min de crudo por actividad (Capturas 1/4, 3/4 y 4/4)',
+                    hasMissingPageAlert: true,
+                    items: [
+                        { id: 'd-01', folder: '01_entrega_premio', time: '09:30', room: 'Sala Magistral', title: 'Entrega premio de cultura hídrica', backedUp: false },
+                        { id: 'd-04', folder: '04_cuenca_lerma', time: '10:15', room: 'Acueducto 1', title: 'Del diagnóstico a la acción: restauración y saneamiento de la cuenca Lerma-Santiago (Claudia Gómez Godoy)', backedUp: false },
+                        { id: 'd-08', folder: '08_programa_queretaro', time: '10:30', room: 'Acueducto 6', title: 'Querétaro, un programa hídrico construido entre todos (Katia Reséndiz Jaime)', backedUp: false },
+                        { id: 'd-10', folder: '10_h2o_talks', time: '10:50', room: 'Salón Principal', title: 'H2O Talks: Innovación que transforma (6 ponentes · 5s c/u + audio consola)', backedUp: false },
+                        { id: 'd-32', folder: '32_ganador_durango', time: '13:15', room: 'Sala Técnica 1', title: 'Ganador Premio Nacional Cultura Hídrica 2026 · Cultura del agua en Durango (Yadira Narvaez · 5s reel Santi)', backedUp: false },
+                        { id: 'd-37', folder: '37_tecnologias_neerlandesas', time: '15:00', room: 'Acueducto 1', title: 'Tecnologías neerlandesas para impulsar la gestión integral (José Antonio Tello, Ignacio Diez, Martín Argueta, Juan Carlos Trejo)', backedUp: false },
+                        { id: 'd-42', folder: '42_economia_circular', time: '15:00', room: 'Acueducto 6', title: 'Materialización del derecho humano al agua a través de la economía circular (Wendy Marisol Ayala, Bruno Guillermo Díaz)', backedUp: false },
+                        { id: 'd-44', folder: '44_eficiencia_hidraulica', time: '15:15', room: 'Sala Técnica 1', title: 'Programa de eficiencia hidráulica en la red de distribución CD SOL II (Jorge Rubio Olivares)', backedUp: false },
+                        { id: 'd-45', folder: '45_digitalizacion_cibersegura', time: '15:15', room: 'Sala Técnica 2', title: 'Ahorro que se mide, operación que se protege: digitalización cibersegura (Luis Felipe Luna González)', backedUp: false },
+                        { id: 'd-48', folder: '48_saneamiento_rural', time: '15:45', room: 'Acueducto 7', title: 'Saneamiento rural sostenible: ecotecnias y soluciones basadas en la naturaleza (Alejandro López Tamayo)', backedUp: false },
+                        { id: 'd-50', folder: '50_redes_hidraulicas', time: '16:00', room: 'Sala Técnica 2', title: 'Redes hidráulicas más eficientes: instalación, ahorro energético y PVC-O (Miguel Ángel Sordo, Noé Alberto Beltrán)', backedUp: false }
+                    ]
+                },
+                sergio: {
+                    id: 'sergio',
+                    name: 'Sergio',
+                    role: 'Video 16:9 · 14 actividades completas (10:00 a 17:30)',
+                    hasMissingPageAlert: false,
+                    items: [
+                        { id: 's-03', folder: '03_mexico_inteligente', time: '10:00', room: 'Salón Principal', title: 'México inteligente en el agua: datos de los organismos operadores y adopción de IA (Gabriela Otero, Benito Arciniega, Arturo Jesús Palma · clip Santi)', backedUp: false },
+                        { id: 's-06', folder: '06_cambio_climatico', time: '10:15', room: 'Acueducto 3', title: 'Hacia la adaptación al cambio climático con soluciones basadas en la naturaleza (Arlex Sanchez Torres)', backedUp: false },
+                        { id: 's-11', folder: '11_redes_hablan', time: '11:00', room: 'Acueducto 1', title: 'Redes que hablan: cuando el agua se convierte en información (Victor Baez Melo)', backedUp: false },
+                        { id: 's-12', folder: '12_estimulos_peas', time: '11:00', room: 'Acueducto 2', title: 'Programa de Estímulos de Agua y Saneamiento (PEAS) CONAGUA (Mariana Navarro Mora)', backedUp: false },
+                        { id: 's-14', folder: '14_cosecha_lluvia', time: '11:00', room: 'Acueducto 7', title: 'Cosecha de lluvia inteligente: monitoreo y automatización (Tirian Mink)', backedUp: false },
+                        { id: 's-18', folder: '18_economia_circular', time: '11:30', room: 'Acueducto 6', title: 'Economía circular del agua: reúso de agua tratada en producción de concreto (Paulette Chambers Rubio)', backedUp: false },
+                        { id: 's-21', folder: '21_evolucion_analitica', time: '11:50', room: 'Acueducto 3', title: 'Evolución analítica: transición hacia la inteligencia de datos (Mario Mata Carrasco)', backedUp: false },
+                        { id: 's-23', folder: '23_marcos_regulatorios', time: '12:00', room: 'Salón Principal', title: 'Marcos regulatorios con enfoque de agua regenerada (Eduardo Viesca, Marcela Ánimas, Alma Leslie Moreno, Ramón Aguirre · clip Brandon)', backedUp: false },
+                        { id: 's-26', folder: '26_ganador_camino', time: '12:30', room: 'Sala Técnica 1', title: 'Ganador Premio Nacional Cultura Hídrica 2026 · El camino del agua (Roberto Manuel Candia Viveros · 5s reel Santi)', backedUp: false },
+                        { id: 's-31', folder: '31_prevision_atmosferica', time: '13:15', room: 'Acueducto 1', title: 'Métodos y técnicas de previsión y alertamiento atmosférico (Fabián Vázquez Romaña)', backedUp: false },
+                        { id: 's-35', folder: '35_acuerdo_violencia', time: '13:40', room: 'Salón Principal', title: 'Acuerdo del sector hídrico por espacios libres de violencia y discriminación (ANEAS · clip Diego)', backedUp: false },
+                        { id: 's-36', folder: '36_entrega_reconocimientos', time: '14:10', room: 'Salón Principal', title: 'Entrega de reconocimientos (Webinar visitas, estado capacitados, Aqua Rating CEA Querétaro)', backedUp: false },
+                        { id: 's-43', folder: '43_factor_humano', time: '15:00', room: 'Acueducto 8', title: 'Transformando organizaciones: el factor humano en un organismo operador de agua (Sergio Gerardo López Martínez)', backedUp: false },
+                        { id: 's-57', folder: '57_plan_toluca', time: '16:45', room: 'Sala Técnica 1', title: 'Plan hídrico 2025-2050: transformando la gestión hídrica en Toluca (Alberto Isaac Valdés Ramírez)', backedUp: false }
+                    ]
+                },
+                brandon: {
+                    id: 'brandon',
+                    name: 'Brandon',
+                    role: 'Celular · Historias 9:16 (10 a 15s) + Clip Marcos regulatorios (16:30)',
+                    hasMissingPageAlert: false,
+                    items: [
+                        { id: 'b-01', folder: '01_entrega_premio', time: '09:30', room: 'Sala Magistral', title: 'Entrega premio de cultura hídrica (Historia)', backedUp: false },
+                        { id: 'b-03', folder: '03_mexico_inteligente', time: '10:00', room: 'Salón Principal', title: 'México inteligente en el agua (Historia salón lleno · sale 10:15)', backedUp: false },
+                        { id: 'b-06', folder: '06_cambio_climatico', time: '10:15', room: 'Acueducto 3', title: 'Hacia la adaptación al cambio climático con soluciones basadas en la naturaleza (Historia)', backedUp: false },
+                        { id: 'b-11', folder: '11_redes_hablan', time: '11:00', room: 'Acueducto 1', title: 'Redes que hablan: cuando el agua se convierte en información (Historia)', backedUp: false },
+                        { id: 'b-14', folder: '14_cosecha_lluvia', time: '11:00', room: 'Acueducto 7', title: 'Cosecha de lluvia inteligente: monitoreo y automatización (Historia)', backedUp: false },
+                        { id: 'b-18', folder: '18_economia_circular', time: '11:30', room: 'Acueducto 6', title: 'Economía circular del agua: reúso de agua tratada en concreto (Historia)', backedUp: false },
+                        { id: 'b-21', folder: '21_evolucion_analitica', time: '11:50', room: 'Acueducto 3', title: 'Evolución analítica: transición hacia la inteligencia de datos (Historia)', backedUp: false },
+                        { id: 'b-23', folder: '23_marcos_regulatorios', time: '12:00', room: 'Salón Principal', title: 'Marcos regulatorios con enfoque de agua regenerada (Edita clip con video Sergio + cel Alan · sale 16:30)', backedUp: false },
+                        { id: 'b-26', folder: '26_ganador_camino', time: '12:30', room: 'Sala Técnica 1', title: 'Ganador Premio Nacional Cultura Hídrica 2026 · El camino del agua (Historia + 5s reel Santi)', backedUp: false },
+                        { id: 'b-31', folder: '31_prevision_atmosferica', time: '13:15', room: 'Acueducto 1', title: 'Métodos y técnicas de previsión y alertamiento atmosférico (Historia)', backedUp: false },
+                        { id: 'b-35', folder: '35_acuerdo_violencia', time: '13:40', room: 'Salón Principal', title: 'Acuerdo del sector hídrico por espacios libres de violencia y discriminación (Historia)', backedUp: false },
+                        { id: 'b-36', folder: '36_entrega_reconocimientos', time: '14:10', room: 'Salón Principal', title: 'Entrega de reconocimientos (Historia)', backedUp: false },
+                        { id: 'b-42', folder: '42_economia_circular', time: '15:00', room: 'Acueducto 6', title: 'Materialización del derecho humano al agua a través de la economía circular (Historia)', backedUp: false },
+                        { id: 'b-44', folder: '44_eficiencia_hidraulica', time: '15:15', room: 'Sala Técnica 1', title: 'Programa de eficiencia hidráulica en la red de distribución CD SOL II (Historia)', backedUp: false },
+                        { id: 'b-48', folder: '48_saneamiento_rural', time: '15:45', room: 'Acueducto 7', title: 'Saneamiento rural sostenible: ecotecnias y soluciones (Historia · va en historia cursos 16:45)', backedUp: false },
+                        { id: 'b-57', folder: '57_plan_toluca', time: '16:45', room: 'Sala Técnica 1', title: 'Plan hídrico 2025-2050: transformando la gestión hídrica en Toluca (Historia)', backedUp: false }
+                    ]
+                },
+                chico4: {
+                    id: 'chico4',
+                    name: '4to Integrante',
+                    role: 'Pestaña lista para agregar las actividades del cuarto integrante (ej. Alan)',
+                    hasMissingPageAlert: false,
+                    isCustomMember: true,
+                    items: []
+                }
+            },
+            reels: [
+                {
+                    id: 'reel-1',
+                    publishTime: '12:15',
+                    category: 'HISTORIA',
+                    formatLabel: 'HISTORIA (Reel · clip)',
+                    title: 'México inteligente en el agua',
+                    source: 'Carpeta #03 de Sergio (frases completas con audio de consola)',
+                    steps: { downloaded: false, edited: false, delivered: false },
+                    notes: '1215_historia_mexico_inteligente_v1.mp4'
+                },
+                {
+                    id: 'reel-2',
+                    publishTime: '13:30',
+                    category: 'REEL',
+                    formatLabel: 'REEL',
+                    title: 'H2O Talks: Arantza explica cada charla',
+                    source: 'Carpeta #10 de Daniel (5s de cada ponente + audio de consola) + tomas de Arantza',
+                    steps: { downloaded: false, edited: false, delivered: false },
+                    notes: '1330_reel_h2o_talks_arantza_v1.mp4'
+                },
+                {
+                    id: 'reel-3',
+                    publishTime: '18:00',
+                    category: 'REEL',
+                    formatLabel: 'REEL',
+                    title: 'Reel 5 · Ganadores del Premio Nacional de Cultura Hídrica',
+                    source: 'Carpetas #32 de Daniel + #26 de Sergio y Brandon (5s de cada ganador)',
+                    steps: { downloaded: false, edited: false, delivered: false },
+                    notes: '1800_reel5_ganadores_cultura_hidrica_v1.mp4'
+                },
+                {
+                    id: 'reel-4',
+                    publishTime: '20:00',
+                    category: 'REEL',
+                    formatLabel: 'REEL',
+                    title: 'Resumen del día 3',
+                    source: 'Mejores tomas del día de Daniel, Sergio, Brandon y 4to integrante',
+                    steps: { downloaded: false, edited: false, delivered: false },
+                    notes: '2000_reel_resumen_dia3_v1.mp4'
+                }
+            ]
+        };
+
+        let appState = loadState();
+        let currentAddMode = 'single';
+
+        // ==========================================
+        // 2. PERSISTENCIA EN LOCALSTORAGE
+        // ==========================================
+        function loadState() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (typeof parsed.searchQuery !== 'string') parsed.searchQuery = '';
+                    return parsed;
+                }
+            } catch (e) {
+                console.error('Error al cargar estado de localStorage:', e);
+            }
+            return JSON.parse(JSON.stringify(INITIAL_DATA));
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+            } catch (e) {
+                console.error('Error al guardar en localStorage:', e);
+            }
+            updateGlobalStats();
+        }
+
+        // ==========================================
+        // 3. UTILIDADES (CLIPBOARD Y NOTIFICACIONES)
+        // ==========================================
+        let toastTimeout;
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            toastMsg.textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2400);
+        }
+
+        function copyToClipboard(text, successMessage) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast(successMessage || 'Copiado ✓');
+            } catch (err) {
+                showToast('No se pudo copiar automáticamente');
+            }
+            document.body.removeChild(textarea);
+        }
+
+        // ==========================================
+        // 4. RENDERIZADO DE INTERFAZ
+        // ==========================================
+        function renderTabs() {
+            const container = document.getElementById('tabs-container');
+            const memberKeys = ['daniel', 'sergio', 'brandon', 'chico4'];
+            let html = '';
+
+            memberKeys.forEach(key => {
+                const m = appState.members[key];
+                const total = m.items.length;
+                const done = m.items.filter(i => i.backedUp).length;
+                const isActive = appState.activeTab === key;
+                const isAllDone = total > 0 && done === total;
+
+                html += `
+                    <button onclick="switchTab('${key}')" role="tab" aria-selected="${isActive}"
+                        class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition cursor-pointer border ${
+                            isActive
+                                ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md shadow-emerald-500/20'
+                                : 'bg-slate-900/80 text-slate-300 hover:text-white hover:bg-slate-800 border-slate-800'
+                        }">
+                        <span>${escapeHtml(m.name)}</span>
+                        <span class="px-1.5 py-0.5 rounded-md text-[11px] font-mono ${
+                            isAllDone
+                                ? isActive
+                                    ? 'bg-slate-950/25 text-slate-950 font-bold'
+                                    : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                : isActive
+                                    ? 'bg-slate-950/20 text-slate-950 font-bold'
+                                    : 'bg-slate-800 text-slate-400'
+                        }">${done}/${total}</span>
+                    </button>
+                `;
+            });
+
+            // Pestaña 5: Mis Ediciones (Santi)
+            const reelsTotal = appState.reels.length;
+            const reelsDelivered = appState.reels.filter(r => r.steps.delivered).length;
+            const isReelsActive = appState.activeTab === 'reels';
+            const isReelsAllDone = reelsTotal > 0 && reelsDelivered === reelsTotal;
+
+            html += `
+                <div class="h-5 w-px bg-slate-800 mx-0.5 shrink-0"></div>
+                <button onclick="switchTab('reels')" role="tab" aria-selected="${isReelsActive}"
+                    class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition cursor-pointer border ${
+                        isReelsActive
+                            ? 'bg-gradient-to-r from-teal-400 to-emerald-400 text-slate-950 border-teal-300 shadow-md shadow-teal-500/20'
+                            : 'bg-slate-900/80 text-teal-300 hover:text-white hover:bg-slate-800 border-teal-900/60'
+                    }">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                    <span>Mis Ediciones (Santi)</span>
+                    <span class="px-1.5 py-0.5 rounded-md text-[11px] font-mono ${
+                        isReelsAllDone
+                            ? isReelsActive
+                                ? 'bg-slate-950/25 text-slate-950 font-bold'
+                                : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                            : isReelsActive
+                                ? 'bg-slate-950/20 text-slate-950 font-bold'
+                                : 'bg-slate-800 text-teal-300'
+                    }">${reelsDelivered}/${reelsTotal}</span>
+                </button>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function updateGlobalStats() {
+            let totalBackups = 0;
+            let doneBackups = 0;
+
+            Object.values(appState.members).forEach(member => {
+                totalBackups += member.items.length;
+                doneBackups += member.items.filter(i => i.backedUp).length;
+            });
+
+            const totalReels = appState.reels.length;
+            const doneReels = appState.reels.filter(r => r.steps.delivered).length;
+
+            const grandTotal = totalBackups + totalReels;
+            const grandDone = doneBackups + doneReels;
+            const grandPct = grandTotal > 0 ? Math.round((grandDone / grandTotal) * 100) : 0;
+
+            document.getElementById('global-total-count').textContent = `${grandDone} / ${grandTotal} completados`;
+            document.getElementById('global-total-bar').style.width = `${grandPct}%`;
+            document.getElementById('global-total-pct').textContent = `${grandPct}%`;
+
+            const reelsPct = totalReels > 0 ? Math.round((doneReels / totalReels) * 100) : 0;
+            document.getElementById('global-reels-count').textContent = `${doneReels}/${totalReels}`;
+            document.getElementById('global-reels-bar').style.width = `${reelsPct}%`;
+            document.getElementById('global-reels-pct').textContent = `${reelsPct}%`;
+
+            renderTabs();
+        }
+
+        function renderActiveView() {
+            const tab = appState.activeTab;
+            const titleEl = document.getElementById('active-tab-title');
+            const badgeEl = document.getElementById('active-tab-badge');
+            const subtitleEl = document.getElementById('active-tab-subtitle');
+            const renameBtn = document.getElementById('rename-member-btn');
+            const addBtnLabel = document.getElementById('add-item-btn-label');
+            const contextAlert = document.getElementById('context-alert');
+            const grid = document.getElementById('cards-grid');
+            const emptyState = document.getElementById('empty-state');
+            const searchFilterBar = document.getElementById('search-filter-bar');
+
+            // Sincronizar input de búsqueda
+            const searchInput = document.getElementById('search-input');
+            const clearSearchBtn = document.getElementById('clear-search-btn');
+            if (searchInput.value !== appState.searchQuery) {
+                searchInput.value = appState.searchQuery;
+            }
+            if (appState.searchQuery.trim() !== '') {
+                clearSearchBtn.classList.remove('hidden');
+            } else {
+                clearSearchBtn.classList.add('hidden');
+            }
+
+            // Actualizar estilos de botones de filtro
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.dataset.filter === appState.filter) {
+                    btn.classList.add('bg-emerald-500', 'text-slate-950', 'font-bold');
+                    btn.classList.remove('text-slate-400', 'hover:text-white', 'font-medium');
+                } else {
+                    btn.classList.remove('bg-emerald-500', 'text-slate-950', 'font-bold');
+                    btn.classList.add('text-slate-400', 'hover:text-white', 'font-medium');
+                }
+            });
+
+            if (tab === 'reels') {
+                // Vista de Mis Ediciones (Santi)
+                const total = appState.reels.length;
+                const delivered = appState.reels.filter(r => r.steps.delivered).length;
+
+                titleEl.textContent = 'Mis Ediciones (Santi)';
+                badgeEl.textContent = `${delivered}/${total} listos`;
+                badgeEl.className = delivered === total && total > 0
+                    ? 'px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                    : 'px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-teal-500/15 text-teal-300 border border-teal-500/30';
+                subtitleEl.textContent = 'Publican Paula o Diego · 1 Historia (Clip) y 3 Reels asignados a Santi';
+                renameBtn.classList.add('hidden');
+                renameBtn.classList.remove('inline-flex');
+                searchFilterBar.classList.remove('hidden');
+                addBtnLabel.textContent = '+ Agregar edición';
+                contextAlert.classList.add('hidden');
+                emptyState.classList.add('hidden');
+                grid.classList.remove('hidden');
+
+                renderReelsCards(grid);
+            } else {
+                // Vista de Respaldo de un Integrante
+                const member = appState.members[tab];
+                const total = member.items.length;
+                const done = member.items.filter(i => i.backedUp).length;
+
+                titleEl.textContent = `Respaldo de Crudos · ${member.name}`;
+                badgeEl.textContent = `${done}/${total} respaldados`;
+                badgeEl.className = done === total && total > 0
+                    ? 'px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                    : 'px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-slate-800 text-slate-300';
+                subtitleEl.textContent = member.role;
+
+                if (member.isCustomMember) {
+                    renameBtn.classList.remove('hidden');
+                    renameBtn.classList.add('inline-flex');
+                } else {
+                    renameBtn.classList.add('hidden');
+                    renameBtn.classList.remove('inline-flex');
+                }
+
+                addBtnLabel.textContent = '+ Agregar actividad';
+
+                if (member.hasMissingPageAlert) {
+                    contextAlert.classList.remove('hidden');
+                } else {
+                    contextAlert.classList.add('hidden');
+                }
+
+                if (total === 0) {
+                    searchFilterBar.classList.add('hidden');
+                    grid.classList.add('hidden');
+                    emptyState.classList.remove('hidden');
+                } else {
+                    searchFilterBar.classList.remove('hidden');
+                    emptyState.classList.add('hidden');
+                    grid.classList.remove('hidden');
+                    renderMemberCards(grid, member);
+                }
+            }
+        }
+
+        function renderMemberCards(container, member) {
+            const q = appState.searchQuery.trim().toLowerCase();
+            const filteredItems = member.items.filter(item => {
+                if (appState.filter === 'pending' && item.backedUp) return false;
+                if (appState.filter === 'done' && !item.backedUp) return false;
+                if (q) {
+                    const haystack = `${item.folder} ${item.time} ${item.room} ${item.title}`.toLowerCase();
+                    return haystack.includes(q);
+                }
+                return true;
+            });
+
+            if (filteredItems.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full bg-[#1e293b]/70 border border-slate-800 rounded-2xl p-8 text-center text-sm text-slate-400">
+                        No hay actividades que coincidan con el filtro o búsqueda actual.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filteredItems.map(item => {
+                const isDone = item.backedUp;
+                return `
+                    <div class="card-transition rounded-2xl p-4 sm:p-5 border flex flex-col justify-between gap-3.5 ${
+                        isDone
+                            ? 'bg-emerald-950/20 border-emerald-500/40 shadow-sm'
+                            : 'bg-[#1e293b] border-slate-700/80 hover:border-slate-600'
+                    }">
+                        <!-- Fila Superior: Checkbox grande + Hora + Sala + Eliminar -->
+                        <div class="flex items-start gap-3.5">
+                            <button onclick="toggleBackup('${member.id}', '${item.id}')" aria-label="Marcar como respaldado"
+                                class="mt-0.5 w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition cursor-pointer border-2 ${
+                                    isDone
+                                        ? 'bg-emerald-500 border-emerald-400 text-slate-950 shadow-md shadow-emerald-500/20'
+                                        : 'bg-slate-900 border-slate-600 hover:border-emerald-400 text-transparent'
+                                }">
+                                <svg class="w-5 h-5 stroke-[3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </button>
+
+                            <div class="flex-1 min-w-0">
+                                <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                                    <span class="inline-flex items-center gap-1 text-xs font-mono font-semibold px-2 py-0.5 rounded-md bg-slate-900 text-slate-300 border border-slate-700">
+                                        <svg class="w-3 h-3 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        ${escapeHtml(item.time)}
+                                    </span>
+                                    ${item.room ? `
+                                        <span class="text-xs font-semibold px-2 py-0.5 rounded-md bg-teal-500/15 text-teal-300 border border-teal-500/30">
+                                            ${escapeHtml(item.room)}
+                                        </span>
+                                    ` : ''}
+                                    ${isDone ? `
+                                        <span class="text-[11px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300">
+                                            RESPALDADO ✓
+                                        </span>
+                                    ` : ''}
+                                </div>
+
+                                <h3 class="text-sm sm:text-base font-semibold leading-snug ${
+                                    isDone ? 'text-slate-400 line-through decoration-emerald-500/60' : 'text-white'
+                                }">
+                                    ${escapeHtml(item.title)}
+                                </h3>
+                            </div>
+
+                            <button onclick="deleteMemberItem('${member.id}', '${item.id}')" title="Eliminar actividad"
+                                class="text-slate-500 hover:text-rose-400 p-1 rounded-lg transition cursor-pointer shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </div>
+
+                        <!-- Fila Inferior: Nombre de carpeta editable + Botón Copiar de un clic -->
+                        <div class="flex items-center gap-2 bg-slate-950/90 border border-slate-800 rounded-xl p-1.5 pl-3">
+                            <svg class="w-4 h-4 text-emerald-400/90 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+                            <input type="text"
+                                value="${escapeHtml(item.folder)}"
+                                onchange="updateFolderName('${member.id}', '${item.id}', this.value)"
+                                aria-label="Nombre de carpeta"
+                                class="bg-transparent text-xs sm:text-sm font-mono font-semibold text-emerald-300 focus:text-white outline-none w-full min-w-0"
+                            />
+                            <button id="copy-btn-${item.id}" onclick="copyFolderName('${member.id}', '${item.id}', this)"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-emerald-500 text-slate-200 hover:text-slate-950 text-xs font-bold transition shrink-0 cursor-pointer active:scale-95">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                <span>Copiar</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderReelsCards(container) {
+            const q = appState.searchQuery.trim().toLowerCase();
+            const filteredReels = appState.reels.filter(reel => {
+                const isDone = reel.steps.delivered;
+                if (appState.filter === 'pending' && isDone) return false;
+                if (appState.filter === 'done' && !isDone) return false;
+                if (q) {
+                    const haystack = `${reel.publishTime} ${reel.formatLabel} ${reel.title} ${reel.source} ${reel.notes}`.toLowerCase();
+                    return haystack.includes(q);
+                }
+                return true;
+            });
+
+            if (filteredReels.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full bg-[#1e293b]/70 border border-slate-800 rounded-2xl p-8 text-center text-sm text-slate-400">
+                        No hay ediciones que coincidan con el filtro o búsqueda actual.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filteredReels.map(reel => {
+                const { downloaded, edited, delivered } = reel.steps;
+                const isFullyDone = delivered;
+                const isHistoria = reel.category === 'HISTORIA';
+
+                return `
+                    <div class="card-transition rounded-2xl p-5 border flex flex-col justify-between gap-4 ${
+                        isFullyDone
+                            ? 'bg-emerald-950/20 border-emerald-500/40'
+                            : 'bg-[#1e293b] border-slate-700/80 hover:border-slate-600'
+                    }">
+                        <div>
+                            <!-- Encabezado con Check Principal de Editado y Entregado -->
+                            <div class="flex items-start gap-3.5 mb-2.5">
+                                <button onclick="toggleReelDelivered('${reel.id}')" title="Marcar Editado y Entregado"
+                                    class="mt-0.5 w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition cursor-pointer border-2 ${
+                                        isFullyDone
+                                            ? 'bg-emerald-500 border-emerald-400 text-slate-950 shadow-md shadow-emerald-500/20'
+                                            : 'bg-slate-900 border-slate-600 hover:border-emerald-400 text-transparent'
+                                    }">
+                                    <svg class="w-5 h-5 stroke-[3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </button>
+
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                                        <span class="inline-flex items-center gap-1 text-xs font-mono font-bold px-2.5 py-0.5 rounded-md bg-slate-900 text-white border border-slate-700">
+                                            <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                            ${escapeHtml(reel.publishTime)}
+                                        </span>
+
+                                        <!-- Etiqueta distintiva HISTORIA vs REEL -->
+                                        <span class="text-xs font-bold px-2.5 py-0.5 rounded-md border ${
+                                            isHistoria
+                                                ? 'bg-amber-500/15 text-amber-300 border-amber-500/40'
+                                                : 'bg-teal-500/15 text-teal-300 border-teal-500/40'
+                                        }">
+                                            ${escapeHtml(reel.formatLabel)}
+                                        </span>
+
+                                        ${isFullyDone ? `
+                                            <span class="text-[11px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300">
+                                                ENTREGADO ✓
+                                            </span>
+                                        ` : ''}
+                                    </div>
+
+                                    <h3 class="text-base sm:text-lg font-bold leading-snug ${
+                                        isFullyDone ? 'text-slate-400 line-through decoration-emerald-500/60' : 'text-white'
+                                    }">${escapeHtml(reel.title)}</h3>
+                                </div>
+
+                                <button onclick="deleteReel('${reel.id}')" title="Eliminar edición" class="text-slate-500 hover:text-rose-400 p-1 rounded-lg transition cursor-pointer shrink-0">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                </button>
+                            </div>
+
+                            <!-- Fuentes de Material -->
+                            <div class="text-xs text-slate-300 bg-slate-900/90 border border-slate-700/80 px-3 py-2 rounded-xl flex items-start gap-2">
+                                <svg class="w-4 h-4 text-teal-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+                                <span><strong class="text-teal-300">Fuente:</strong> ${escapeHtml(reel.source)}</span>
+                            </div>
+                        </div>
+
+                        <!-- Sub-checks Rápidos (3 Pasos) -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                            ${renderReelStepBtn(reel.id, 'downloaded', 'Crudo descargado', downloaded)}
+                            ${renderReelStepBtn(reel.id, 'edited', 'Editado', edited)}
+                            ${renderReelStepBtn(reel.id, 'delivered', 'Enviado a Paula/Diego', delivered)}
+                        </div>
+
+                        <!-- Campo de Archivo Final / Notas -->
+                        <div class="flex items-center gap-2 bg-slate-950/90 border border-slate-800 rounded-xl p-1.5 pl-3">
+                            <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider shrink-0">Export:</span>
+                            <input type="text"
+                                value="${escapeHtml(reel.notes)}"
+                                onchange="updateReelNotes('${reel.id}', this.value)"
+                                placeholder="Nombre de export o nota..."
+                                class="bg-transparent text-xs font-mono text-emerald-300 focus:text-white outline-none w-full min-w-0"
+                            />
+                            <button onclick="copyReelNotes('${reel.id}', this)"
+                                class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-emerald-500 text-slate-200 hover:text-slate-950 text-xs font-bold transition shrink-0 cursor-pointer">
+                                Copiar
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderReelStepBtn(reelId, stepKey, label, isChecked) {
+            return `
+                <button onclick="toggleReelStep('${reelId}', '${stepKey}')"
+                    class="flex items-center gap-2 px-2.5 py-2 rounded-xl border text-xs font-semibold transition cursor-pointer ${
+                        isChecked
+                            ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300'
+                            : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                    }">
+                    <span class="w-4 h-4 rounded flex items-center justify-center shrink-0 ${
+                        isChecked ? 'bg-emerald-500 text-slate-950' : 'border border-slate-600'
+                    }">
+                        ${isChecked ? '<svg class="w-3 h-3 stroke-[3]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>' : ''}
+                    </span>
+                    <span class="truncate">${label}</span>
+                </button>
+            `;
+        }
+
+        // ==========================================
+        // 5. ACCIONES E INTERACCIONES
+        // ==========================================
+        function switchTab(tabKey) {
+            appState.activeTab = tabKey;
+            saveState();
+            renderActiveView();
+        }
+
+        function setFilter(filterKey) {
+            appState.filter = filterKey;
+            saveState();
+            renderActiveView();
+        }
+
+        function setSearchQuery(val) {
+            appState.searchQuery = val;
+            renderActiveView();
+        }
+
+        function clearSearch() {
+            appState.searchQuery = '';
+            renderActiveView();
+        }
+
+        function toggleBackup(memberId, itemId) {
+            const member = appState.members[memberId];
+            const item = member.items.find(i => i.id === itemId);
+            if (item) {
+                item.backedUp = !item.backedUp;
+                saveState();
+                renderActiveView();
+                if (item.backedUp) {
+                    showToast(`Respaldado: ${item.folder}`);
+                }
+            }
+        }
+
+        function updateFolderName(memberId, itemId, newName) {
+            const cleaned = newName.trim();
+            if (!cleaned) return;
+            const item = appState.members[memberId].items.find(i => i.id === itemId);
+            if (item) {
+                item.folder = cleaned;
+                saveState();
+                showToast('Carpeta actualizada ✓');
+            }
+        }
+
+        function copyFolderName(memberId, itemId, btnEl) {
+            const item = appState.members[memberId].items.find(i => i.id === itemId);
+            if (item) {
+                copyToClipboard(item.folder, `Copiado ✓ (${item.folder})`);
+                if (btnEl) {
+                    const originalHtml = btnEl.innerHTML;
+                    btnEl.innerHTML = '<span>Copiado ✓</span>';
+                    btnEl.classList.add('bg-emerald-500', 'text-slate-950');
+                    btnEl.classList.remove('bg-slate-800', 'text-slate-200');
+                    setTimeout(() => {
+                        btnEl.innerHTML = originalHtml;
+                        btnEl.classList.remove('bg-emerald-500', 'text-slate-950');
+                        btnEl.classList.add('bg-slate-800', 'text-slate-200');
+                    }, 1400);
+                }
+            }
+        }
+
+        function deleteMemberItem(memberId, itemId) {
+            const member = appState.members[memberId];
+            member.items = member.items.filter(i => i.id !== itemId);
+            saveState();
+            renderActiveView();
+            showToast('Actividad eliminada');
+        }
+
+        // Acciones de Mis Ediciones (Santi)
+        function toggleReelDelivered(reelId) {
+            const reel = appState.reels.find(r => r.id === reelId);
+            if (reel) {
+                const nextState = !reel.steps.delivered;
+                reel.steps.delivered = nextState;
+                if (nextState) {
+                    reel.steps.downloaded = true;
+                    reel.steps.edited = true;
+                    showToast(`Entregado ✓ (${reel.title})`);
+                }
+                saveState();
+                renderActiveView();
+            }
+        }
+
+        function toggleReelStep(reelId, stepKey) {
+            const reel = appState.reels.find(r => r.id === reelId);
+            if (reel) {
+                reel.steps[stepKey] = !reel.steps[stepKey];
+                if (stepKey === 'delivered' && reel.steps.delivered) {
+                    reel.steps.downloaded = true;
+                    reel.steps.edited = true;
+                }
+                saveState();
+                renderActiveView();
+            }
+        }
+
+        function updateReelNotes(reelId, value) {
+            const reel = appState.reels.find(r => r.id === reelId);
+            if (reel) {
+                reel.notes = value.trim();
+                saveState();
+                showToast('Archivo/nota guardado ✓');
+            }
+        }
+
+        function copyReelNotes(reelId, btnEl) {
+            const reel = appState.reels.find(r => r.id === reelId);
+            if (reel && reel.notes) {
+                copyToClipboard(reel.notes, 'Copiado ✓');
+                if (btnEl) {
+                    btnEl.textContent = 'Copiado ✓';
+                    btnEl.classList.add('bg-emerald-500', 'text-slate-950');
+                    setTimeout(() => {
+                        btnEl.textContent = 'Copiar';
+                        btnEl.classList.remove('bg-emerald-500', 'text-slate-950');
+                    }, 1400);
+                }
+            }
+        }
+
+        function deleteReel(reelId) {
+            appState.reels = appState.reels.filter(r => r.id !== reelId);
+            saveState();
+            renderActiveView();
+            showToast('Edición eliminada');
+        }
+
+        // ==========================================
+        // 6. MODALES (AGREGAR, RENOMBRAR, RESETEAR)
+        // ==========================================
+        function openAddModal(initialMode = 'single') {
+            const modal = document.getElementById('add-modal');
+            const isReels = appState.activeTab === 'reels';
+            const modeSwitcher = document.getElementById('add-mode-switcher');
+            const roomWrapper = document.getElementById('room-field-wrapper');
+            const modalTitle = document.getElementById('add-modal-title');
+            const folderLabel = document.getElementById('folder-field-label');
+            const timeLabel = document.getElementById('time-field-label');
+            const titleLabel = document.getElementById('title-field-label');
+
+            document.getElementById('single-add-form').reset();
+            document.getElementById('bulk-add-form').reset();
+            setAddMode(isReels ? 'single' : initialMode);
+
+            if (isReels) {
+                modalTitle.textContent = 'Agregar edición para Santi';
+                modeSwitcher.classList.add('hidden');
+                roomWrapper.classList.add('hidden');
+                folderLabel.textContent = 'Tipo (HISTORIA o REEL) *';
+                document.getElementById('inp-folder').placeholder = 'REEL';
+                timeLabel.textContent = 'Hora de publicación *';
+                document.getElementById('inp-time').placeholder = '19:30';
+                titleLabel.textContent = 'Título de la entrega *';
+            } else {
+                const memberName = appState.members[appState.activeTab].name;
+                modalTitle.textContent = `Agregar actividad a ${memberName}`;
+                modeSwitcher.classList.remove('hidden');
+                roomWrapper.classList.remove('hidden');
+                folderLabel.textContent = 'Carpeta ([num]_[palabra]) *';
+                document.getElementById('inp-folder').placeholder = 'ej. 15_tema_clave';
+                timeLabel.textContent = 'Hora *';
+                document.getElementById('inp-time').placeholder = 'ej. 12:00';
+                titleLabel.textContent = 'Título de la ponencia *';
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function setAddMode(mode) {
+            currentAddMode = mode;
+            const singleForm = document.getElementById('single-add-form');
+            const bulkForm = document.getElementById('bulk-add-form');
+            const singleBtn = document.getElementById('mode-single-btn');
+            const bulkBtn = document.getElementById('mode-bulk-btn');
+
+            if (mode === 'single') {
+                singleForm.classList.remove('hidden');
+                bulkForm.classList.add('hidden');
+                singleBtn.classList.add('bg-emerald-500', 'text-slate-950');
+                singleBtn.classList.remove('text-slate-400');
+                bulkBtn.classList.remove('bg-emerald-500', 'text-slate-950');
+                bulkBtn.classList.add('text-slate-400');
+            } else {
+                singleForm.classList.add('hidden');
+                bulkForm.classList.remove('hidden');
+                bulkBtn.classList.add('bg-emerald-500', 'text-slate-950');
+                bulkBtn.classList.remove('text-slate-400');
+                singleBtn.classList.remove('bg-emerald-500', 'text-slate-950');
+                singleBtn.classList.add('text-slate-400');
+            }
+        }
+
+        function handleSingleAdd(e) {
+            e.preventDefault();
+            const f1 = document.getElementById('inp-folder').value.trim();
+            const f2 = document.getElementById('inp-time').value.trim();
+            const f3 = document.getElementById('inp-room').value.trim();
+            const f4 = document.getElementById('inp-title').value.trim();
+
+            if (appState.activeTab === 'reels') {
+                const isHist = f1.toUpperCase().includes('HISTORIA') || f1.toUpperCase().includes('CLIP');
+                appState.reels.push({
+                    id: 'reel-' + Date.now(),
+                    publishTime: f2,
+                    category: isHist ? 'HISTORIA' : 'REEL',
+                    formatLabel: isHist ? 'HISTORIA (Reel · clip)' : 'REEL',
+                    title: f4,
+                    source: 'Fuente por asignar',
+                    steps: { downloaded: false, edited: false, delivered: false },
+                    notes: `${f2.replace(':', '')}_${isHist ? 'historia' : 'reel'}_nuevo_v1.mp4`
+                });
+            } else {
+                appState.members[appState.activeTab].items.push({
+                    id: 'item-' + Date.now(),
+                    folder: f1,
+                    time: f2,
+                    room: f3,
+                    title: f4,
+                    backedUp: false
+                });
+            }
+
+            saveState();
+            renderActiveView();
+            closeModal('add-modal');
+            showToast('Agregado correctamente ✓');
+        }
+
+        function handleBulkAdd(e) {
+            e.preventDefault();
+            const raw = document.getElementById('inp-bulk').value.trim();
+            if (!raw) return;
+
+            const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+            let addedCount = 0;
+
+            lines.forEach((line, idx) => {
+                const parts = line.split('|').map(p => p.trim());
+                if (parts.length >= 2) {
+                    appState.members[appState.activeTab].items.push({
+                        id: `bulk-${Date.now()}-${idx}`,
+                        folder: parts[0] || `00_actividad_${idx + 1}`,
+                        time: parts[1] || '00:00',
+                        room: parts.length >= 4 ? parts[2] : '',
+                        title: parts.length >= 4 ? parts[3] : (parts[2] || parts[1]),
+                        backedUp: false
+                    });
+                    addedCount++;
+                }
+            });
+
+            if (addedCount > 0) {
+                saveState();
+                renderActiveView();
+                closeModal('add-modal');
+                showToast(`${addedCount} actividades importadas ✓`);
+            } else {
+                showToast('Revisa el formato separado por "|"');
+            }
+        }
+
+        function handleInlineRename(e) {
+            e.preventDefault();
+            const name = document.getElementById('inline-member-name').value.trim();
+            if (name) {
+                appState.members.chico4.name = name;
+                saveState();
+                renderActiveView();
+                showToast(`Pestaña actualizada a ${name} ✓`);
+            }
+        }
+
+        function openRenameModal() {
+            const member = appState.members.chico4;
+            document.getElementById('inp-member-name').value = member.name === '4to Integrante' ? '' : member.name;
+            document.getElementById('inp-member-role').value = member.role;
+            const modal = document.getElementById('rename-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function handleRenameMember(e) {
+            e.preventDefault();
+            const name = document.getElementById('inp-member-name').value.trim();
+            const role = document.getElementById('inp-member-role').value.trim();
+            if (name) {
+                appState.members.chico4.name = name;
+                if (role) appState.members.chico4.role = role;
+                saveState();
+                renderActiveView();
+                closeModal('rename-modal');
+                showToast(`Pestaña renombrada a ${name} ✓`);
+            }
+        }
+
+        function openResetModal() {
+            const modal = document.getElementById('reset-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function resetAllData() {
+            appState = JSON.parse(JSON.stringify(INITIAL_DATA));
+            saveState();
+            renderActiveView();
+            closeModal('reset-modal');
+            showToast('Todo reiniciado a plantilla inicial');
+        }
+
+        // ==========================================
+        // 7. REPORTE RÁPIDO PARA WHATSAPP
+        // ==========================================
+        function copyWhatsAppReport() {
+            const lines = [];
+            lines.push('*ESTATUS RESPALDOS & EDICIONES · ANEAS 2026 (MIÉ 25 NOV)*');
+            lines.push('');
+            lines.push('*RESPALDO DE CRUDOS:*');
+
+            ['daniel', 'sergio', 'brandon', 'chico4'].forEach(key => {
+                const m = appState.members[key];
+                const total = m.items.length;
+                if (total === 0 && key === 'chico4') return;
+                const done = m.items.filter(i => i.backedUp).length;
+                const check = total > 0 && done === total ? '✅' : '⏳';
+                lines.push(`${check} *${m.name}:* ${done}/${total} carpetas respaldadas`);
+            });
+
+            lines.push('');
+            lines.push('*MIS EDICIONES (SANTI):*');
+            appState.reels.forEach(r => {
+                const statusIcon = r.steps.delivered
+                    ? '✅ Enviado a Paula/Diego'
+                    : r.steps.edited
+                        ? '🎬 Editado (por enviar)'
+                        : r.steps.downloaded
+                            ? '📥 Crudo descargado'
+                            : '⏳ Pendiente';
+                lines.push(`• [${r.publishTime} · ${r.category}] ${r.title}: ${statusIcon}`);
+            });
+
+            copyToClipboard(lines.join('\n'), 'Reporte copiado ✓');
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // Inicializar aplicación al cargar
+        window.addEventListener('DOMContentLoaded', () => {
+            updateGlobalStats();
+            renderActiveView();
+        });
+    </script>
+</body>
+</html>
